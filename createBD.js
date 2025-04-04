@@ -93,5 +93,5 @@ async function main() {
 console.log("База данных создана")
 
 main()
-  .catch((error) => console.error("❌ Ошибка:", error))
+  .catch((error) => console.error("Ошибка:", error))
   .finally(() => prisma.$disconnect());

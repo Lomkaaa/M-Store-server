@@ -18,20 +18,22 @@ const {
 const { auth } = require("../middleware/auth");
 
 const storageProduct = multer.diskStorage({
-  destination: path.join(__dirname, "../uploads/products/"), // Папка uploads
+  destination: path.join(__dirname, "../uploads/products/"), 
   filename: (req, file, cb) => {
-    const fileName = Date.now() + path.extname(file.originalname); // Уникальное имя файла
-    cb(null, fileName);
+    
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const extname = path.extname(file.originalname); 
+    cb(null, uniqueSuffix + extname); 
   },
 });
-const uploadProduct = multer({ storage: storageProduct }).array("files"); // Загружаем несколько файлов
+
+const uploadProduct = multer({ storage: storageProduct }).array("files");
 
 // показать где хранить файлы Аватаров
 const storageAvatar = multer.diskStorage({
-  destination: path.join(__dirname,"../uploads/avatar/"),
-  filename: (req, file, cb) => {
-    const fileName = Date.now() + path.extname(file.originalname); // Уникальное имя файла
-    cb(null, fileName);
+  destination: "uploads/avatar/",
+  filename: function (req, file, cb) {
+    cb(null, file.originalname);
   },
 });
 const uploadAvatar = multer({ storage: storageAvatar }).single("file");

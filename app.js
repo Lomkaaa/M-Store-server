@@ -4,8 +4,8 @@ const cors = require("cors")
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const fs = require("fs")
-const path = require("path");
 const updateOrderStatuses =require("./updateOrderStatuses") 
+const cleanupUnusedFiles = require("./cleanupUnusedFiles")
 require("dotenv").config()
 
 const app = express();
