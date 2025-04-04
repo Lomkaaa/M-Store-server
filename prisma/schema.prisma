@@ -1,0 +1,139 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  email     String     @unique
+  password  String
+  avatarUrl String?
+  reviews   Review[]
+  basket    Basket[]
+  favorites Favorite[]
+  histories History[]
+  orders    Order[] 
+  role      String     @default("USER")
+  balance   Float      @default(0)
+  phone     String?
+  updatedAt DateTime   @updatedAt
+  createdAt DateTime   @default(now())
+}
+
+model Category {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String    @unique
+  products Product[]
+}
+
+model Brand {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  name     String    @unique
+  products Product[]
+}
+
+model Favorite {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String  @db.ObjectId
+  user      User    @relation(fields: [userId], references: [id])
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Product {
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  price          Float
+  discount       Int              @default(0)
+  imageUrl       String?
+  value     Int     @default(1)
+  otherImages String[]
+  brandId        String           @db.ObjectId
+  description         String?
+  brand          Brand            @relation(fields: [brandId], references: [id])
+  categoryId     String           @db.ObjectId
+  category       Category         @relation(fields: [categoryId], references: [id])
+  reviews        Review[]
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  favorite       Favorite[]
+  basket         Basket[]
+  historyProduct HistoryProduct[]
+  orderItems     OrderItem[]
+}
+
+model Basket {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  value     Int     @default(1)
+  userId    String  @db.ObjectId
+  user      User    @relation(fields: [userId], references: [id])
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String?
+  value     Int
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  productId String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model History {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String           @db.ObjectId
+  user      User             @relation(fields: [userId], references: [id])
+  products  HistoryProduct[]
+  createdAt DateTime         @default(now())
+}
+
+model HistoryProduct {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  historyId String  @db.ObjectId
+  history   History @relation(fields: [historyId], references: [id])
+  productId String  @db.ObjectId
+  product   Product @relation(fields: [productId], references: [id])
+  value     Int
+}
+model Order {
+  id        String    @id @default(auto())  @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  user      User      @relation(fields: [userId], references: [id])
+  total     Int       @default(0)
+  status    OrderStatus @default(PENDING)
+  createdAt DateTime  @default(now()) 
+  updatedAt DateTime  @updatedAt
+  products  OrderItem[] 
+}
+
+enum OrderStatus {
+  PENDING      // Заказ в ожидании
+  PAID         // Оплачено
+  SHIPPED      // Отправлено
+  DELIVERED    // Доставлено
+  CANCELLED    // Отменено
+}
+
+model OrderItem {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String   @db.ObjectId
+  order     Order    @relation(fields: [orderId], references: [id])
+  productId String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id])
+  value     Int      
+  price     Float
+}
