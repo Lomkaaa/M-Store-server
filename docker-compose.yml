@@ -5,6 +5,7 @@ services:
       - '3000:3000'
     depends_on:
       - db
+      - frontend
     environment:
       DATABASE_URL: 'mongodb://monty:pass@db:27017/mydatabase?authSource=admin&directConnection=true'
  db: # База данных
@@ -14,3 +15,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: monty
       MONGO_INITDB_ROOT_PASSWORD: pass
+ frontend: 
+   build: ../frontend
+   ports:
+     - "80:80"
